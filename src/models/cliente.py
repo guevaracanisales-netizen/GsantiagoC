@@ -28,4 +28,4 @@ class Cliente:
         print("ID:", self.__id_cliente)
 
     def __str__(self):
-        return self.__nombre + " - " + str(self.__cedula)
+        return self.__nombre + " - " + str(self.__cedula) 
