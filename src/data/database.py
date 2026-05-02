@@ -301,13 +301,10 @@ def guardar_todas_reservas(reservas):
             conexion.close()
 
 def cargar_clientes():
-    filas = consultar_clientes()
-    return [Cliente(f[1], f[2], f[0]) for f in filas] if filas else []
+    return consultar_clientes()
 
 def cargar_carros():
-    filas = consultar_carros()
-    return [Carro(f[1], f[2], f[3], f[4]) for f in filas] if filas else []
-
+    return consultar_carros()
 def cargar_reservas(clientes):
     filas = consultar_reservas()
     resultado = []
