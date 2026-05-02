@@ -2,11 +2,13 @@ import flet as ft
 import shutil, os
 from models.cliente import Cliente
 from models.reserva import Reserva
-from data.database import guardar_cliente, guardar_reserva, cargar_clientes, cargar_reservas, cargar_carros
+from data.database import guardar_cliente, guardar_reserva, cargar_clientes, cargar_reservas, cargar_carros, crear_base_datos
+
+crear_base_datos()
 from views.components import encabezado, tarjeta_reserva, NEGRO, GRIS, CLARO, BLANCO, BORDE
 from views.carros_view import vista_carros
 from views.clientes_view import vista_clientes
-from views.reservas_view import vista_reservas   # ← NUEVO
+from views.reservas_view import vista_reservas
 
 clientes = []
 reservas = []
@@ -137,16 +139,13 @@ def main(page: ft.Page):
     for r, dl in reservas:
         lista_reservas_ui.controls.append(tarjeta_reserva(r, dl))
 
-    # ── Pantallas ────────────────────────────────────────────────────────────
-    pantalla_paso1            = ft.Column(visible=True,  spacing=0, horizontal_alignment="center")
-    pantalla_paso2            = ft.Column(visible=False, spacing=0, horizontal_alignment="center")
-    pantalla_reservas         = ft.Column(visible=False, spacing=0, horizontal_alignment="center")
-    pantalla_carros           = ft.Column(visible=False, spacing=0, horizontal_alignment="center")
-    pantalla_clientes         = ft.Column(visible=False, spacing=0, horizontal_alignment="center")
-    pantalla_mis_reservas     = ft.Column(visible=False, spacing=0, horizontal_alignment="center")
-    pantalla_reservas         = ft.Column(visible=False, spacing=0, horizontal_alignment="center")  
+    pantalla_paso1       = ft.Column(visible=True,  spacing=0, horizontal_alignment="center")
+    pantalla_paso2       = ft.Column(visible=False, spacing=0, horizontal_alignment="center")
+    pantalla_reservas    = ft.Column(visible=False, spacing=0, horizontal_alignment="center")
+    pantalla_carros      = ft.Column(visible=False, spacing=0, horizontal_alignment="center")
+    pantalla_clientes    = ft.Column(visible=False, spacing=0, horizontal_alignment="center")
+    pantalla_reservas = ft.Column(visible=False, spacing=0, horizontal_alignment="center")
 
-    # ── Navegación ───────────────────────────────────────────────────────────
     def pasar_a_paso2(c):
         estado["cliente_actual"] = c
         lbl_bienvenida.value = f"Hola {c.get_nombre()}, elige tu viaje 👇"
@@ -229,7 +228,7 @@ def main(page: ft.Page):
         grid_carros.controls.clear()
         pantalla_reservas.visible     = False
         pantalla_paso2.visible        = False
-        pantalla_mis_reservas.visible = False
+        pantalla_reservas.visible = False
         pantalla_paso1.visible        = True
         page.update()
 
@@ -253,15 +252,21 @@ def main(page: ft.Page):
         pantalla_paso1.visible    = True
         page.update()
 
-    def volver_reservas_admin(e):
-        pantalla_reservas.visible = False
-        pantalla_paso1.visible    = True
+    def ir_a_mis_reservas(e):
+        pantalla_reservas.visible     = False
+        pantalla_reservas.visible = True
+        pantalla_reservas.controls = [
+            vista_reservas(page, reservas, estado["cliente_actual"], volver_mis_reservas)
+        ]
         page.update()
 
-    # ── Contenido de pantallas ───────────────────────────────────────────────
+    def volver_mis_reservas(e):
+        pantalla_reservas.visible = False
+        pantalla_reservas.visible     = True
+        page.update()
+
     pantalla_carros.controls   = [vista_carros(page, carros, volver_carros)]
     pantalla_clientes.controls = [vista_clientes(page, clientes, volver_clientes)]
-    pantalla_reservas.controls = [vista_reservas(page, reservas, volver_reservas_admin)]
 
     pantalla_paso1.controls = [
         encabezado(),
@@ -271,9 +276,8 @@ def main(page: ft.Page):
                 ft.Row([
                     ft.Text("PASO 1 — Datos del cliente", size=17, weight="bold", color=NEGRO),
                     ft.Row([
-                        ft.ElevatedButton("👤 Clientes",  on_click=ir_a_clientes,       bgcolor=GRIS, color=BLANCO),
-                        ft.ElevatedButton("🚗 Carros",    on_click=ir_a_carros,         bgcolor=GRIS, color=BLANCO),
-                        ft.ElevatedButton("📋 Reservas",  on_click=ir_a_reservas, bgcolor=GRIS, color=BLANCO),  # ← NUEVO
+                        ft.ElevatedButton("👤 Clientes", on_click=ir_a_clientes, bgcolor=GRIS, color=BLANCO),
+                        ft.ElevatedButton("🚗 Carros",   on_click=ir_a_carros,   bgcolor=GRIS, color=BLANCO),
                     ], spacing=8),
                 ], alignment="spaceBetween"),
                 ft.Divider(color=BORDE, height=1),
@@ -325,21 +329,15 @@ def main(page: ft.Page):
                 ft.Divider(color=BORDE, height=1),
                 lista_reservas_ui,
                 ft.Row([
-                    ft.ElevatedButton("← Nueva reserva", on_click=volver_a_inicio, bgcolor=NEGRO, color=BLANCO),
+                    ft.ElevatedButton("📋 Mis reservas",  on_click=ir_a_mis_reservas, bgcolor=GRIS,  color=BLANCO),
+                    ft.ElevatedButton("← Nueva reserva", on_click=volver_a_inicio,   bgcolor=NEGRO, color=BLANCO),
                 ], spacing=10),
             ], spacing=16),
         ),
     ]
 
-    page.add(
-        pantalla_paso1,
-        pantalla_paso2,
-        pantalla_reservas,
-        pantalla_carros,
-        pantalla_clientes,
-        pantalla_mis_reservas,
-        pantalla_reservas,   
-    )
+    page.add(pantalla_paso1, pantalla_paso2, pantalla_reservas,
+             pantalla_carros, pantalla_clientes, pantalla_reservas)
 
 ft.app(target=main)
 

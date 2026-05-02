@@ -1,4 +1,22 @@
+def validar_campos(func):
+    def envoltura(*args, **kwargs):
+        for arg in args[1:]:
+            if isinstance(arg, str) and not arg.strip():
+                raise ValueError("⚠ Los campos no pueden estar vacíos.")
+        return func(*args, **kwargs)
+    return envoltura
+
+def log_accion(func):
+    def envoltura(*args, **kwargs):
+        print(f"[LOG] Ejecutando: {func.__name__}")
+        resultado = func(*args, **kwargs)
+        print(f"[LOG] {func.__name__} ejecutado correctamente.")
+        return resultado
+    return envoltura
+
 class Carro:
+    @validar_campos
+    @log_accion
     def __init__(self, placa, modelo, anio, marca):
         self.__placa  = placa
         self.__modelo = modelo
@@ -28,6 +46,14 @@ class Carro:
 
     def set_marca(self, marca):
         self.__marca = marca
+
+    # **kwargs: actualiza solo los atributos que le pases
+    def actualizar(self, **kwargs):
+        if "placa"  in kwargs: self.__placa  = kwargs["placa"]
+        if "modelo" in kwargs: self.__modelo = kwargs["modelo"]
+        if "anio"   in kwargs: self.__anio   = kwargs["anio"]
+        if "marca"  in kwargs: self.__marca  = kwargs["marca"]
+        print(f"[LOG] Carro {self.__placa} actualizado con: {kwargs}")
 
     def mostrar(self):
         print("Placa:",  self.__placa)
