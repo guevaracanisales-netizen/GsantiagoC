@@ -16,6 +16,7 @@ def crear_base_datos():
             CREATE TABLE IF NOT EXISTS clientes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 cedula TEXT UNIQUE NOT NULL,
+                celular TEXT DEFAULT '',
                 nombre TEXT NOT NULL,
                 fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
@@ -35,6 +36,7 @@ def crear_base_datos():
             CREATE TABLE IF NOT EXISTS reservas (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 cedula TEXT NOT NULL,
+                dir_recogida TEXT DEFAULT '',
                 hora_salida TEXT NOT NULL,
                 hora_llegada TEXT NOT NULL,
                 sector TEXT NOT NULL,
@@ -46,7 +48,24 @@ def crear_base_datos():
         ''')
 
         conexion.commit()
+
+        # ── Carros por defecto (los mismos del disponibilidad en main.py)
+        carros_iniciales = [
+            ("ABC123", "Corolla", "2020", "Toyota"),
+            ("DEF456", "Spark",   "2021", "Chevrolet"),
+            ("GHI789", "Sandero", "2019", "Renault"),
+            ("JKL012", "Logan",   "2022", "Renault"),
+            ("MNO345", "Sail",    "2021", "Chevrolet"),
+        ]
+        for placa, modelo, anio, marca in carros_iniciales:
+            cursor.execute(
+                "INSERT OR IGNORE INTO carros (placa, modelo, anio, marca) VALUES (?, ?, ?, ?)",
+                (placa, modelo, anio, marca)
+            )
+
+        conexion.commit()
         print(f"Base de datos '{nombre_bd}' y tablas creadas con éxito.")
+        print("Carros iniciales cargados.")
 
     except sqlite3.Error as e:
         print(f"Error al crear la base de datos: {e}")
@@ -56,12 +75,12 @@ def crear_base_datos():
 
 
 # ─── CLIENTES ───
-def insertar_cliente(cedula, nombre):
+def insertar_cliente(cedula, nombre, celular=""):
     try:
         conexion = sqlite3.connect(nombre_bd)
         cursor = conexion.cursor()
-        sql = "INSERT INTO clientes (cedula, nombre) VALUES (?, ?)"
-        cursor.execute(sql, (cedula, nombre))
+        sql = "INSERT INTO clientes (cedula, nombre, celular) VALUES (?, ?, ?)"
+        cursor.execute(sql, (cedula, nombre, celular))
         conexion.commit()
         print(f"Cliente '{nombre}' guardado correctamente.")
     except sqlite3.IntegrityError:
@@ -73,6 +92,7 @@ def insertar_cliente(cedula, nombre):
             conexion.close()
 
 def consultar_clientes():
+    filas = []
     try:
         conexion = sqlite3.connect(nombre_bd)
         cursor = conexion.cursor()
@@ -136,6 +156,7 @@ def insertar_carro(placa, modelo, anio, marca):
             conexion.close()
 
 def consultar_carros():
+    filas = []
     try:
         conexion = sqlite3.connect(nombre_bd)
         cursor = conexion.cursor()
@@ -182,12 +203,12 @@ def actualizar_carro(placa_actual, nueva_placa, modelo, anio, marca):
 
 
 # ─── RESERVAS ───
-def insertar_reserva(cedula, hora_salida, hora_llegada, sector, dir_llegada):
+def insertar_reserva(cedula, hora_salida, hora_llegada, sector, dir_llegada, dir_recogida=""):
     try:
         conexion = sqlite3.connect(nombre_bd)
         cursor = conexion.cursor()
-        sql = "INSERT INTO reservas (cedula, hora_salida, hora_llegada, sector, dir_llegada) VALUES (?, ?, ?, ?, ?)"
-        cursor.execute(sql, (cedula, hora_salida, hora_llegada, sector, dir_llegada))
+        sql = "INSERT INTO reservas (cedula, hora_salida, hora_llegada, sector, dir_llegada, dir_recogida) VALUES (?, ?, ?, ?, ?, ?)"
+        cursor.execute(sql, (cedula, hora_salida, hora_llegada, sector, dir_llegada, dir_recogida))
         conexion.commit()
         print(f"Reserva guardada correctamente.")
     except sqlite3.Error as e:
@@ -197,6 +218,7 @@ def insertar_reserva(cedula, hora_salida, hora_llegada, sector, dir_llegada):
             conexion.close()
 
 def consultar_reservas():
+    filas = []
     try:
         conexion = sqlite3.connect(nombre_bd)
         cursor = conexion.cursor()
@@ -243,11 +265,11 @@ def confirmar_reserva_db(reserva_id):
 
 # ─── FUNCIONES COMPATIBLES CON EL MAIN ───
 def guardar_cliente(c):
-    insertar_cliente(c.get_cedula(), c.get_nombre())
+    insertar_cliente(c.get_cedula(), c.get_nombre(), c.get_celular())
 
-def guardar_reserva(r, dir_llegada):
+def guardar_reserva(r, dir_llegada, dir_recogida=""):
     insertar_reserva(r.get_cliente().get_cedula(), r.get_hora_salida(),
-                     r.get_hora_llegada(), r.get_sector(), dir_llegada)
+                     r.get_hora_llegada(), r.get_sector(), dir_llegada, dir_recogida)
 
 def guardar_carro(c):
     insertar_carro(c.get_placa(), c.get_modelo(), c.get_anio(), c.get_marca())
@@ -273,8 +295,8 @@ def guardar_todos_clientes(clientes):
         cursor = conexion.cursor()
         cursor.execute("DELETE FROM clientes")
         for c in clientes:
-            cursor.execute("INSERT INTO clientes (cedula, nombre) VALUES (?, ?)",
-                           (c.get_cedula(), c.get_nombre()))
+            cursor.execute("INSERT INTO clientes (cedula, nombre, celular) VALUES (?, ?, ?)",
+                           (c.get_cedula(), c.get_nombre(), c.get_celular()))
         conexion.commit()
     except sqlite3.Error as e:
         print(f"Error al guardar clientes: {e}")
@@ -305,6 +327,7 @@ def cargar_clientes():
 
 def cargar_carros():
     return consultar_carros()
+
 def cargar_reservas(clientes):
     filas = consultar_reservas()
     resultado = []
@@ -321,4 +344,4 @@ def cargar_reservas(clientes):
 if __name__ == "__main__":
     crear_base_datos()
     print("Base de datos aquí:")
-    print(os.path.abspath(nombre_bd)) 
+    print(os.path.abspath(nombre_bd))

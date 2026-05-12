@@ -212,12 +212,12 @@ def main(page: ft.Page):
         hora_llegada = hora_llegada_map.get(estado["hora"], "—")
         r = Reserva(c, estado["hora"], hora_llegada, destino.value)
         dl = txt_dir_llegada.value.strip()
-        guardar_reserva(r, dl)
+        dr = txt_direccion.value.strip()
+        guardar_reserva(r, dl, dr)
         reservas.append((r, dl))
         lista_reservas_ui.controls.append(tarjeta_reserva(r, dl))
         ocultar_todas()
-        if origen == "confirmacion": pantalla_confirmacion.visible = True
-        else: pantalla_paso1.visible = True
+        pantalla_confirmacion.visible = True
         page.update()
 
     def volver_a_inicio(e):

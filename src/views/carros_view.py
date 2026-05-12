@@ -4,7 +4,6 @@ from data.database import guardar_carro, guardar_todos_carros
 
 NEGRO  = "#1a1a1a"
 GRIS   = "#5a5a5a"
-CLARO  = "#f2f2f2"
 BLANCO = "#ffffff"
 BORDE  = "#cccccc"
 ROJO   = "#c0392b"
@@ -32,8 +31,7 @@ def vista_carros(page: ft.Page, carros: list, on_volver):
             if any(x.get_placa().upper() == nueva_placa and x is not c for x in carros):
                 dlg.open = False
                 lbl_error.value = "⚠ Ya existe un carro con esa placa."
-                page.update()
-                return
+                page.update(); return
             c.set_placa(nueva_placa); c.set_modelo(em.value.strip())
             c.set_anio(ea.value.strip()); c.set_marca(emarca.value.strip())
             guardar_todos_carros(carros)
@@ -90,8 +88,7 @@ def vista_carros(page: ft.Page, carros: list, on_volver):
 
         if any(c.get_placa().upper() == txt_placa.value.strip().upper() for c in carros):
             lbl_error.value = "⚠ Ya existe un carro con esa placa."
-            page.update()
-            return
+            page.update(); return
 
         c = Carro(txt_placa.value.strip().upper(), txt_modelo.value.strip(),
                   txt_anio.value.strip(), txt_marca.value.strip())
@@ -107,23 +104,26 @@ def vista_carros(page: ft.Page, carros: list, on_volver):
             bgcolor=NEGRO,
             padding=ft.padding.symmetric(horizontal=28, vertical=16),
             content=ft.Row([
-                ft.Text("🚗", size=22),
+                ft.Image(src="https://cdn-icons-png.flaticon.com/512/3063/3063822.png", width=36, height=36),
                 ft.Column([
                     ft.Text("ReViTe", size=20, weight="bold", color=BLANCO),
                     ft.Text("Gestión de Carros", size=11, color="#aaa"),
                 ], spacing=0),
             ], spacing=10),
         ),
-        ft.Container(padding=ft.padding.all(28), content=ft.Column([
-            ft.Text("AGREGAR CARRO", size=17, weight="bold", color=NEGRO),
-            ft.Divider(color=BORDE, height=1),
-            ft.Row([txt_placa, txt_modelo], spacing=10),
-            ft.Row([txt_anio,  txt_marca],  spacing=10),
-            lbl_error,
-            ft.ElevatedButton("Agregar +", on_click=agregar, bgcolor=NEGRO, color=BLANCO),
-            ft.Divider(color=BORDE, height=1),
-            ft.Text("CARROS REGISTRADOS", size=17, weight="bold", color=NEGRO),
-            lista_ui,
-            ft.ElevatedButton("← Volver", on_click=on_volver, bgcolor=NEGRO, color=BLANCO),
-        ], spacing=14)),
+        ft.Container(
+            padding=ft.padding.symmetric(horizontal=28, vertical=16),
+            content=ft.Column([
+                ft.Text("AGREGAR CARRO", size=17, weight="bold", color=NEGRO),
+                ft.Divider(color=BORDE, height=1),
+                ft.Row([txt_placa, txt_modelo], spacing=10),
+                ft.Row([txt_anio,  txt_marca],  spacing=10),
+                lbl_error,
+                ft.ElevatedButton("Agregar +", on_click=agregar, bgcolor=NEGRO, color=BLANCO),
+                ft.Divider(color=BORDE, height=1),
+                ft.Text("CARROS REGISTRADOS", size=17, weight="bold", color=NEGRO),
+                lista_ui,
+                ft.ElevatedButton("← Volver", on_click=on_volver, bgcolor=NEGRO, color=BLANCO),
+            ], spacing=10),
+        ),
     ], spacing=0)

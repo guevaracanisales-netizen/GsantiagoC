@@ -37,8 +37,7 @@ def vista_reservas(page: ft.Page, reservas: list, cliente_actual, on_volver):
                 ft.Text(f"📍 {dir_llegada}", size=12, color=GRIS),
                 ft.Text(
                     "Confirmada" if r.get_confirmado() else "Pendiente",
-                    color=VERDE if r.get_confirmado() else GRIS,
-                    size=12,
+                    color=VERDE if r.get_confirmado() else GRIS, size=12,
                 ),
                 ft.Row([
                     ft.IconButton(icon=ft.icons.CHECK,  on_click=confirmar, icon_color=VERDE),
@@ -53,13 +52,21 @@ def vista_reservas(page: ft.Page, reservas: list, cliente_actual, on_volver):
         ft.Container(
             bgcolor=NEGRO,
             padding=ft.padding.symmetric(horizontal=28, vertical=16),
-            content=ft.Text("📋 Mis Reservas", color=BLANCO, size=20),
+            content=ft.Row([
+                ft.Image(src="https://cdn-icons-png.flaticon.com/512/3063/3063822.png", width=36, height=36),
+                ft.Column([
+                    ft.Text("ReViTe", size=20, weight="bold", color=BLANCO),
+                    ft.Text("Mis Reservas", size=11, color="#aaa"),
+                ], spacing=0),
+            ], spacing=10),
         ),
         ft.Container(
-            padding=ft.padding.all(28),
+            padding=ft.padding.symmetric(horizontal=28, vertical=16),
             content=ft.Column([
+                ft.Text("RESERVAS REALIZADAS", size=17, weight="bold", color=NEGRO),
+                ft.Divider(color=BORDE, height=1),
                 lista_ui,
                 ft.ElevatedButton("← Volver", on_click=on_volver, bgcolor=NEGRO, color=BLANCO),
-            ], spacing=12),
+            ], spacing=10),
         ),
     ])

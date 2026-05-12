@@ -3,7 +3,6 @@ from data.database import guardar_todos_clientes
 
 NEGRO  = "#1a1a1a"
 GRIS   = "#5a5a5a"
-CLARO  = "#f2f2f2"
 BLANCO = "#ffffff"
 BORDE  = "#cccccc"
 ROJO   = "#c0392b"
@@ -24,18 +23,14 @@ def vista_clientes(page: ft.Page, clientes: list, on_volver):
             nueva_cedula = ec.value.strip()
             if any(x.get_cedula() == nueva_cedula and x is not c for x in clientes):
                 lbl_err.value = "⚠ Ya existe un cliente con esa cédula."
-                page.update()
-                return
+                page.update(); return
             c.set_cedula(nueva_cedula)
             c.set_nombre(en.value.strip())
             guardar_todos_clientes(clientes)
             dlg.open = False
             refrescar()
 
-        dlg.content = ft.Column([
-            ft.Row([ec, en], spacing=10),
-            lbl_err,
-        ], tight=True, spacing=10)
+        dlg.content = ft.Column([ft.Row([ec, en], spacing=10), lbl_err], tight=True, spacing=10)
         dlg.actions = [
             ft.TextButton("Cancelar", on_click=lambda e: setattr(dlg, 'open', False) or page.update()),
             ft.ElevatedButton("Guardar", on_click=guardar, bgcolor=NEGRO, color=BLANCO),
@@ -69,34 +64,30 @@ def vista_clientes(page: ft.Page, clientes: list, on_volver):
         for c in clientes:
             lista_ui.controls.append(tarjeta(c))
         if not clientes:
-            lista_ui.controls.append(
-                ft.Text("No hay clientes registrados.", color=GRIS, italic=True, size=12))
+            lista_ui.controls.append(ft.Text("No hay clientes registrados.", color=GRIS, italic=True, size=12))
         page.update()
 
     refrescar()
 
     return ft.Column([
         ft.Container(
-            bgcolor=NEGRO,
-            width=float("inf"),
+            bgcolor=NEGRO, width=float("inf"),
             padding=ft.padding.symmetric(horizontal=28, vertical=16),
             content=ft.Row([
-                ft.Row([
-                    ft.Text("👤", size=22),
-                    ft.Column([
-                        ft.Text("ReViTe", size=20, weight="bold", color=BLANCO),
-                        ft.Text("Clientes Registrados", size=11, color="#aaa"),
-                    ], spacing=0),
-                ], spacing=10),
-            ], alignment="center"),
+                ft.Image(src="https://cdn-icons-png.flaticon.com/512/3063/3063822.png", width=36, height=36),
+                ft.Column([
+                    ft.Text("ReViTe", size=20, weight="bold", color=BLANCO),
+                    ft.Text("Clientes Registrados", size=11, color="#aaa"),
+                ], spacing=0),
+            ], spacing=10),
         ),
         ft.Container(
-            width=660, padding=ft.padding.all(28),
+            width=660, padding=ft.padding.symmetric(horizontal=28, vertical=16),
             content=ft.Column([
                 ft.Text("CLIENTES REGISTRADOS", size=17, weight="bold", color=NEGRO),
                 ft.Divider(color=BORDE, height=1),
                 lista_ui,
                 ft.ElevatedButton("← Volver", on_click=on_volver, bgcolor=NEGRO, color=BLANCO),
-            ], spacing=14),
+            ], spacing=10),
         ),
-    ], spacing=0, horizontal_alignment="center")
+    ], spacing=0, horizontal_alignment="center") 
