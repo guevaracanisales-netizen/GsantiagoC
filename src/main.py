@@ -26,7 +26,7 @@ disponibilidad = {
 }
 
 hora_llegada_map = {
-    "6:00": "7:00", "6:30": "7:30", "7:00": "8:00",
+    "6:00": "7:00", "6:30": "7:30", "7:00": "10:00",
     "7:30": "8:30", "8:00": "9:00", "8:30": "9:30",
 }
 
@@ -41,7 +41,7 @@ def main(page: ft.Page):
     carros.extend(cargar_carros())
     reservas.extend(cargar_reservas(clientes))
 
-    # ── Campos
+    # campos
     txt_cedula    = ft.TextField(label="Cédula",             width=220, bgcolor=BLANCO, border_radius=8)
     txt_nombre    = ft.TextField(label="Nombre",             width=220, bgcolor=BLANCO, border_radius=8)
     txt_direccion = ft.TextField(label="Dirección recogida", width=220, bgcolor=BLANCO, border_radius=8)
@@ -54,7 +54,7 @@ def main(page: ft.Page):
     lbl_bienvenida = ft.Text("", size=14, color=NEGRO, weight="bold")
     lbl_cliente_encontrado = ft.Text("", color="#2e7d32", size=12, weight="bold")
 
-    # ── Foto
+    # foto
     img_foto   = ft.Image(src="", width=82, height=82, fit="cover", border_radius=8, visible=False)
     icono_foto = ft.Column([ft.Text("📷", size=50), ft.Text("Foto", size=11, color=GRIS)],
                            horizontal_alignment="center")
@@ -84,7 +84,7 @@ def main(page: ft.Page):
 
     campos_nuevos = ft.Column([txt_nombre, txt_direccion, txt_celular], spacing=10, visible=True)
 
-    # ── Destino y carros
+    # destinos y carros
     destino = ft.RadioGroup(
         on_change=lambda e: actualizar_carros(),
         content=ft.Column([ft.Radio(value=v, label=v) for v in
@@ -135,12 +135,12 @@ def main(page: ft.Page):
             on_click=lambda e, hora=h: sel_hora(hora),
         ))
 
-    # ── Lista de reservas (pantalla confirmación)
+    # lista de reservas (pantalla confirmación)
     lista_reservas_ui = ft.Column(spacing=10, width=600)
     for r, dl in reservas:
         lista_reservas_ui.controls.append(tarjeta_reserva(r, dl))
 
-    # ── Pantallas — ahora con nombres distintos y sin duplicados
+    # pantallas 
     pantalla_paso1        = ft.Column(visible=True,  spacing=0, horizontal_alignment="center")
     pantalla_paso2        = ft.Column(visible=False, spacing=0, horizontal_alignment="center")
     pantalla_confirmacion = ft.Column(visible=False, spacing=0, horizontal_alignment="center")  # ← después de crear reserva
@@ -148,13 +148,13 @@ def main(page: ft.Page):
     pantalla_carros       = ft.Column(visible=False, spacing=0, horizontal_alignment="center")
     pantalla_clientes     = ft.Column(visible=False, spacing=0, horizontal_alignment="center")
 
-    # ── Helper para ocultar todas las pantallas
+    # ocultar todas las pantallas
     def ocultar_todas():
         for p in [pantalla_paso1, pantalla_paso2, pantalla_confirmacion,
                   pantalla_mis_reservas, pantalla_carros, pantalla_clientes]:
             p.visible = False
 
-    # ── Navegación
+    # navegación
     def pasar_a_paso2(c):
         estado["cliente_actual"] = c
         lbl_bienvenida.value = f"Hola {c.get_nombre()}, elige tu viaje 👇"
@@ -269,7 +269,7 @@ def main(page: ft.Page):
         else: pantalla_paso1.visible = True
         page.update()
 
-    # ── Armar pantallas
+    # armar pantallas
     pantalla_carros.controls   = [vista_carros(page, carros, volver_carros)]
     pantalla_clientes.controls = [vista_clientes(page, clientes, volver_clientes)]
 

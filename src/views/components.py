@@ -15,9 +15,9 @@ def encabezado():
             ft.Row([
                 # ── Logo genérico de transporte
                 ft.Image(
-                    src="https://cdn-icons-png.flaticon.com/512/3063/3063822.png",
-                    width=40,
-                    height=40,
+                    src=r"C:\Users\USUARIO\Downloads\Gemini_Generated_Image_phrvuophrvuophrv.png",
+                    width=80,
+                    height=60,
                 ),
                 ft.Column([
                     ft.Text("ReViTe", size=20, weight="bold", color=BLANCO),
